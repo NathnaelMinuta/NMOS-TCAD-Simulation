@@ -1,0 +1,204 @@
+SDEVICE COMMANDS
+File {
+      Grid = "@tdr@"
+      Current = "@plot@"
+      Plot = "@tdrdat@"
+      Output = "@log@"
+}
+Electrode {
+      { Name = "source"      Voltage = 0.0 Resist = 20}
+      { Name = "drain"      Voltage = 0.0 Resist = 20}
+      { Name = "gate"      Voltage = 0.0 Workfunction = 4.2}
+      { Name = "bulk"      Voltage = 0.0}
+}
+Physics {
+      Mobility(
+      DopingDependence HighFieldSaturation Enormal
+      )
+      EffectiveIntrinsicDensity (
+      )
+      eQuantumPotential
+}
+Plot {
+      Doping DonorConcentration AcceptorConcentration
+      ElectricField/Vector Potential
+      SpaceCharge
+      BandGap EffectiveBandGap BandGapNarrowing ElectronAffinity
+      ConductionBandEnergy ValenceBandEnergy
+      eDensity hDensity
+      eDriftVelocity/Vector hDriftVelocity/Vector
+      EffectiveIntrinsicDensity IntrinsicDensity
+      eQuasiFermiEnergy hQuasiFermiEnergy
+      eGradQuasiFermi/Vector hGradQuasiFermi/Vector
+      eMobility hMobility eVelocity hVelocity
+      Current/Vector eCurrent/Vector hCurrent/Vector
+      eBand2BandGeneration hBand2BandGeneration Band2BandGeneration
+      eAvalanche hAvalanche Avalanche
+      SRHrecombination
+      tSRHrecombination
+      eQuantumPotential
+}
+Math {
+      Extrapolate
+
+      Derivatives
+      -RelErrControl
+      Digits = 20
+      Error (electron) = 1e8
+      Error (hole) = 1e8
+
+      eDrForceRefDens = 1e10
+      hDrForceRefDens = 1e10
+
+      Iterations = 20
+
+      Method = ParDiSo
+      Direccurrent
+      Wallclock
+      CNormPrint
+      NoSRHperPotential
+}
+Solve {
+      Coupled { Poisson eQuantumPotential }
+      Coupled { Poisson eQuantumPotential Electron Hole}
+
+      Quasistationary (
+       InitialStep = 1e-2
+       MinStep = 1e-3 MaxStep = 0.005
+       Goal { Name = "drain" Voltage = @VD@ }
+       plot { range= (0,1) intervals =1 }
+      )      
+{ Coupled { Poisson eQuantumPotential Electron Hole } }
+ NewCurrentPrefix="IdVg_"
+  Quasistationary (
+      DoZero
+      InitialStep = 1e-2
+      MinStep = 1e-3 MaxStep = 0.005 
+      Goal { Name = "gate" Voltage = @VG@}
+      plot { range = (0,1) intervals = 1 }
+)
+{Coupled { Poisson eQuantumPotential Electron Hole } 
+}
+}
+
+ 
+; =====================
+; File Paths and Outputs
+; =====================
+File {
+      Grid = "@tdr@"         ; Input grid file
+      Current = "@plot@"     ; File to store current results
+      Plot = "@tdrdat@"      ; File to store plotting data
+      Output = "@log@"       ; Log file for simulation details
+}
+
+; ====================
+; Electrode Definitions
+; ====================
+Electrode {
+      { Name = "source" Voltage = 0.0 Resist = 20 }          ; Source contact, grounded, with resistance
+      { Name = "drain" Voltage = 0.0 Resist = 20 }           ; Drain contact, grounded, with resistance
+      { Name = "gate" Voltage = 0.0 Workfunction = 4.2 }     ; Gate contact with work function defined
+      { Name = "bulk" Voltage = 0.0 }                        ; Bulk contact, grounded
+}
+
+; =========================
+; Physics Models Definitions
+; =========================
+Physics {
+      Mobility (
+            DopingDependence HighFieldSaturation Enormal    ; Mobility includes doping effects and high-field saturation
+      )
+      EffectiveIntrinsicDensity (                            ; Effective intrinsic density model
+      )
+      eQuantumPotential                                       ; Include quantum potential effects for electrons
+}
+
+; =========================
+; Plot Data Configuration
+; =========================
+Plot {
+      ; Doping profiles
+      Doping DonorConcentration AcceptorConcentration
+      ; Electric properties
+      ElectricField/Vector Potential SpaceCharge
+      ; Band properties
+      BandGap EffectiveBandGap BandGapNarrowing ElectronAffinity
+      ConductionBandEnergy ValenceBandEnergy
+      ; Carrier densities
+      eDensity hDensity
+      ; Drift velocities
+      eDriftVelocity/Vector hDriftVelocity/Vector
+      ; Intrinsic densities
+      EffectiveIntrinsicDensity IntrinsicDensity
+      ; Quasi-Fermi levels
+      eQuasiFermiEnergy hQuasiFermiEnergy
+      ; Gradients of Fermi levels
+      eGradQuasiFermi/Vector hGradQuasiFermi/Vector
+      ; Mobilities and velocities
+      eMobility hMobility eVelocity hVelocity
+      ; Currents
+      Current/Vector eCurrent/Vector hCurrent/Vector
+      ; Generation and recombination rates
+      eBand2BandGeneration hBand2BandGeneration Band2BandGeneration
+      eAvalanche hAvalanche Avalanche
+      SRHrecombination tSRHrecombination
+      ; Quantum effects
+      eQuantumPotential
+}
+
+; ============================
+; Mathematical Solvers Settings
+; ============================
+Math {
+      Extrapolate                     ; Enable extrapolation for better convergence
+      Derivatives                     ; Use derivatives for solving equations
+      -RelErrControl                  ; Disable relative error control for robustness
+      Digits = 20                     ; Precision digits
+      Error (electron) = 1e8          ; Error tolerance for electrons
+      Error (hole) = 1e8              ; Error tolerance for holes
+      eDrForceRefDens = 1e10          ; Reference density for electron forcing
+      hDrForceRefDens = 1e10          ; Reference density for hole forcing
+      Iterations = 20                 ; Maximum number of solver iterations
+      Method = ParDiSo                ; Use ParDiSo solver
+      Direccurrent                    ; Enable direct current computation
+      Wallclock                       ; Track wall-clock time
+      CNormPrint                      ; Print convergence norm
+      NoSRHperPotential               ; Disable per-potential SRH recombination
+}
+
+; ============================
+; Solve Commands and Goals
+; ============================
+Solve {
+      ; Solve Poisson equation with quantum potential
+      Coupled { Poisson eQuantumPotential }
+      ; Solve for Poisson, quantum potential, and carriers
+      Coupled { Poisson eQuantumPotential Electron Hole }
+
+      ; Quasi-static simulation for drain voltage sweep
+      Quasistationary (
+            InitialStep = 1e-2        ; Initial voltage step size
+            MinStep = 1e-3            ; Minimum voltage step size
+            MaxStep = 0.005           ; Maximum voltage step size
+            Goal { Name = "drain" Voltage = @VD@ } ; Sweep goal: drain voltage
+            plot { range = (0,1) intervals = 1 }   ; Plot settings
+      )
+      { 
+        Coupled { Poisson eQuantumPotential Electron Hole } 
+      }
+
+      ; Quasi-static simulation for gate voltage sweep
+      NewCurrentPrefix = "IdVg_"      ; Prefix for output files
+      Quasistationary (
+            DoZero                    ; Start from zero voltage
+            InitialStep = 1e-2        ; Initial voltage step size
+            MinStep = 1e-3            ; Minimum voltage step size
+            MaxStep = 0.005           ; Maximum voltage step size
+            Goal { Name = "gate" Voltage = @VG@ } ; Sweep goal: gate voltage
+            plot { range = (0,1) intervals = 1 }   ; Plot settings
+      )
+      { 
+        Coupled { Poisson eQuantumPotential Electron Hole } 
+      }
+}
