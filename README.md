@@ -13,16 +13,6 @@ Device Design: Define NMOS geometry and doping profiles in SDE.
 Electrical Simulation: Analyze I-V curves, threshold voltage, and punch-through conditions using SDevice.
 Result Visualization: Generate band diagrams, electron density profiles, and electrostatic potential maps in SVisual.
 
-## Directory Structure
-
-NMOS_Transistor_Simulation_TCAD/
-├── sde/                  # SDE input files for device geometry and doping
-├── sdevice/              # SDevice input files for electrical simulations
-├── svisual/              # SVisual configuration and output files
-├── report/               # Final project report and additional documentation
-├── LICENSE               # License file (optional)
-└── README.md             # Project description and usage guide
-
 ##  Prerequisites
 Sentaurus TCAD: Licensed software including SDE, SDevice, and SVisual.
 A computer capable of running intensive simulations.
@@ -69,3 +59,12 @@ Lab instructions from EE303 course at Minnesota State University, Mankato.
 Research paper references included in the final report.
 License
 This project is for educational and academic purposes. Please contact the author for permission if you intend to use the files for commercial applications.
+## Directory Structure
+```plaintext
+NMOS_Transistor_Simulation_TCAD/
+├── sde/                  # SDE input files for device geometry and doping
+├── sdevice/              # SDevice input files for electrical simulations
+├── svisual/              # SVisual configuration and output files
+├── report/               # Final project report and additional documentation
+├── LICENSE               # License file (optional)
+└── README.md             # Project description and usage guide
