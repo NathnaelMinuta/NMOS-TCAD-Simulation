@@ -1,0 +1,45 @@
+SVISUAL COMMANDS
+#setdep @node|sdevice@
+
+set n @node|sdevice@
+# determine sdevice node status
+set status @[gproject::GetNodeStatus @node|sdevice@]@
+
+# Create plot if it does not exist and set properties
+if {[llength [list_plots Plot_1D]]==0} {
+create_plot -1d -name Plot_1D
+select_plots Plot_1D
+set_plot_prop -hide_title -show_legend
+set_axis_prop -title_font_size 16 -label_font_size 14
+set_axis_prop -axis x -title "Gate Voltage (V)" -type linear
+set_axis_prop -axis y -title "Drain Current (A/<greek>m</greek>m)" -type log
+set_legend_prop -label_font_size 14 -location bottom_right
+}
+
+# Load and create IV curve
+
+load_file @[relpath IdVg_n@node|sdevice@_des.plt]@ -name PLT($n)
+create_curve -name IdVg($n) -dataset PLT($n) -axisX "gate InnerVoltage" -axisY "drain TotalCurrent"
+
+# Extract curve parameters only when sdevice node has status done
+if { $status == "done" } {
+ load_library extract
+ set Vgs [get_variable_data "gate OuterVoltage" -dataset PLT($n)]
+ set Ids [get_variable_data "drain TotalCurrent" -dataset PLT($n)]
+ ext::ExtractVtgm out=Vtgm name=Vtgm v= $Vgs i= $Ids
+ ext::ExtractExtremum out=Id name=Id x= $Vgs y= $Ids type=max
+ ext::ExtractSS out=SS name=SS v= $Vgs i= $Ids vo= [expr $Vtgm/3.0]
+ ext::ExtractGm out=gm name=gm v= $Vgs i= $Ids
+}
+          
+# set curve properties only if script is called through run visualizer button
+       if {[info exists runVisualizerNodesTogether]} {
+       # the variables color and legend are provided by swb,
+       # and are individual for each curve
+       set_curve_prop IdVg_($n) -label "IdVg $legend" \
+        -color $color -line_style $line -line_width 3
+} else {
+puts "To see the curves, select both Sentaurus Visual nodes and at the toolbar"
+puts "press the \"Run selected Visualizer Nodes Together\" button."
+}
+
