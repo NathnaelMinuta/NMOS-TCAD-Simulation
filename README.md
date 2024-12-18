@@ -10,7 +10,9 @@ The project demonstrates the use of SDE, SDevice, and SVisual tools for structur
 
 ## Features
 Device Design: Define NMOS geometry and doping profiles in SDE.
+
 Electrical Simulation: Analyze I-V curves, threshold voltage, and punch-through conditions using SDevice.
+
 Result Visualization: Generate band diagrams, electron density profiles, and electrostatic potential maps in SVisual.
 
 ##  Prerequisites
@@ -47,17 +49,21 @@ sde/: Contains all input files required to define the device structure.
 sdevice/: Input files for running simulations on the defined NMOS structure.
 svisual/: Files for configuring visualization and analyzing results.
 report/: Includes the detailed final report in PDF format summarizing all observations.
-Graphs and Visuals
+
+## Graphs and Visuals
 Key visuals from the simulations include:
 
 ID vs. VG curves: Analyzing threshold voltage and drive current.
 Band diagrams: Showing energy bands for different doping levels.
 Electron density profiles: Highlighting conduction regions.
-References
+
+## References
 Sentaurus TCAD Documentation
 Lab instructions from EE303 course at Minnesota State University, Mankato.
 Research paper references included in the final report.
-License
+
+
+## License
 This project is for educational and academic purposes. Please contact the author for permission if you intend to use the files for commercial applications.
 ## Directory Structure
 ```plaintext
