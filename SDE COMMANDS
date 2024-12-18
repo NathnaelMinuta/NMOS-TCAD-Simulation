@@ -1,0 +1,105 @@
+SDE COMMANDS
+; =============================
+; Geometry and Material Definition
+; =============================
+
+; Define the substrate region (Silicon Substrate)
+(sdegeo:create-rectangle (position 0 0 0) (position 0.25 0.4 0) "Silicon" "Substrate")
+
+; Define the source region (n+ doped Silicon Source)
+(sdegeo:create-rectangle (position 0 0.05 0) (position 0.05 0.15 0) "Silicon" "Source")
+
+; Define the drain region (n+ doped Silicon Drain)
+(sdegeo:create-rectangle (position 0 0.25 0) (position 0.05 0.35 0) "Silicon" "Drain")
+
+; Define the source contact (Aluminum Contact on Source)
+(sdegeo:create-rectangle (position 0 0.05 0) (position -0.005 0.11 0) "Aluminum" "Contact_Source")
+
+; Define the drain contact (Aluminum Contact on Drain)
+(sdegeo:create-rectangle (position 0 0.29 0) (position -0.005 0.35 0) "Aluminum" "Contact_Drain")
+
+; Define the oxide layer (SiO2 Gate Oxide)
+(sdegeo:create-rectangle (position 0 0.11 0) (position -0.002 0.29 0) "SiO2" "Oxide_thickness")
+
+; Define the gate region (PolySilicon Gate)
+(sdegeo:create-rectangle (position -0.002 0.15 0) (position -0.02 0.25 0) "PolySilicon" "Gate")
+
+; Define sidewall nitride layers (Si3N4 Sidewalls)
+(sdegeo:create-rectangle (position -0.002 0.11 0) (position -0.06 0.15 0) "Si3N4" "Nitride1")
+(sdegeo:create-rectangle (position -0.002 0.25 0) (position -0.06 0.29 0) "Si3N4" "Nitride2")
+
+; Add rounded corners to nitride layers for realistic geometry
+(sdegeo:fillet-2d (list (car (find-vertex-id (position -0.06 0.29 0)))) 0.03)
+(sdegeo:fillet-2d (list (car (find-vertex-id (position -0.06 0.11 0)))) 0.03)
+
+; ====================================
+; Doping Profiles and Regions Definition
+; ====================================
+
+; Substrate doping (p-type Boron)
+(sdedr:define-constant-profile "Substrate_Doping" "BoronActiveConcentration" @sub_doping@)
+(sdedr:define-constant-profile-region "Substrate_Doping" "Substrate_Doping" "Substrate")
+
+; Source doping (n+ Phosphorus)
+(sdedr:define-constant-profile "Source_Doping" "PhosphorusActiveConcentration" 1e+20)
+(sdedr:define-constant-profile-region "Source_Doping" "Source_Doping" "Source")
+
+; Drain doping (n+ Phosphorus)
+(sdedr:define-constant-profile "Drain_Doping" "PhosphorusActiveConcentration" 1e+20)
+(sdedr:define-constant-profile-region "Drain_Doping" "Drain_Doping" "Drain")
+
+; ==========================
+; Contact and Bias Definition
+; ==========================
+
+; Define source contact
+(sdegeo:define-contact-set "source" 4 (color:rgb 1 0 0) "##")
+(sdegeo:set-contact (list (car (find-edge-id (position 0 0.08 0)))) "source")
+
+; Define drain contact
+(sdegeo:define-contact-set "drain" 4 (color:rgb 1 0 0) "##")
+(sdegeo:set-contact (list (car (find-edge-id (position 0 0.32 0)))) "drain")
+
+; Define gate contact
+(sdegeo:define-contact-set "gate" 4 (color:rgb 1 0 0) "##")
+(sdegeo:set-contact (list 
+    (car (find-edge-id (position -0.02 0.2 0))) 
+    (car (find-edge-id (position -0.04 0.15 0))) 
+    (car (find-edge-id (position -0.04 0.25 0)))) "gate")
+
+; Define bulk contact
+(sdegeo:define-contact-set "bulk" 4 (color:rgb 1 0 0) "##")
+(sdegeo:set-contact (list (car (find-edge-id (position 0.25 0.2 0)))) "bulk")
+
+
+
+; =====================
+; Mesh Refinement Setup
+; =====================
+
+; Substrate mesh refinement
+(sdedr:define-refeval-window "Mesh_Substrate" "Rectangle" (position 0 0 0) (position 0.25 0.4 0))
+(sdedr:define-refinement-size "Mesh_Substrate_Ref_Def" 0.0035 0.0035 0 0.0025 0.0025 0)
+(sdedr:define-refinement-placement "Mesh_Substrate_Ref" "Mesh_Substrate_Ref_Def" (list "region" "Substrate"))
+
+; Source mesh refinement
+(sdedr:define-refeval-window "Source_Mesh" "Rectangle" (position 0 0.05 0) (position 0.05 0.15 0))
+(sdedr:define-refinement-size "Mesh_Source_Ref_Def" 0.0025 0.0025 0 0.001 0.001 0)
+(sdedr:define-refinement-placement "Mesh_Source_Ref" "Mesh_Source_Ref_Def" (list "region" "Source"))
+
+; Drain mesh refinement
+(sdedr:define-refeval-window "Drain_Mesh" "Rectangle" (position 0 0.25 0) (position 0.05 0.35 0))
+(sdedr:define-refinement-size "Mesh_Drain_Ref_Def" 0.0025 0.0025 0 0.001 0.001 0)
+(sdedr:define-refinement-placement "Mesh_Drain_Ref" "Mesh_Drain_Ref_Def" (list "region" "Drain"))
+
+
+
+; ==================
+; Simulation Commands
+; ==================
+
+; Build the device mesh
+(sde:build-mesh "n@node@_msh")
+
+; Run the simulation with specified parameters
+(system:command "tdx -mtt -x -M 0 -S 0 -ren drain=source n@node@_msh")
